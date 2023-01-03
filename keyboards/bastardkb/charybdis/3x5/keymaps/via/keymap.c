@@ -31,7 +31,7 @@ enum charybdis_keymap_layers {
 };
 
 // Automatically enable sniping-mode on the pointer layer.
-#define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_POINTER
+// #define CHARYBDIS_AUTO_SNIPING_ON_LAYER LAYER_POINTER
 
 #ifdef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
 static uint16_t auto_pointer_layer_timer = 0;
@@ -51,6 +51,13 @@ static uint16_t auto_pointer_layer_timer = 0;
 #define ENT_SYM LT(LAYER_SYMBOLS, KC_ENT)
 #define BSP_NUM LT(LAYER_NUMERAL, KC_BSPC)
 #define _L_PTR(KC) LT(LAYER_POINTER, KC)
+
+#define UNDO LGUI(KC_Z)
+#define COPY LGUI(KC_C)
+#define CUT LGUI(KC_X)
+#define PASTE LGUI(KC_V)
+#define GO_BACK LGUI(KC_LEFT)
+#define GO_FWRD LGUI(KC_RIGHT)
 
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
@@ -110,10 +117,10 @@ static uint16_t auto_pointer_layer_timer = 0;
 
 /** \brief Mouse emulation and pointer functions. */
 #define LAYOUT_LAYER_POINTER                                                                  \
-    XXXXXXX, XXXXXXX, XXXXXXX, DPI_MOD, S_D_MOD, S_D_MOD, DPI_MOD, XXXXXXX, XXXXXXX, XXXXXXX, \
+    XXXXXXX, XXXXXXX, XXXXXXX, DPI_MOD, S_D_MOD,    CUT,     COPY,   PASTE, GO_BACK, GO_FWRD, \
     ______________HOME_ROW_GACS_L______________, ______________HOME_ROW_GACS_R______________, \
-    _______, DRGSCRL, SNIPING,  EE_CLR, QK_BOOT, QK_BOOT,  EE_CLR, SNIPING, DRGSCRL, _______, \
-                      KC_BTN2, KC_BTN1, KC_BTN3, KC_BTN3, KC_BTN1
+    _______, DRGSCRL, SNIPING, XXXXXXX, XXXXXXX, KC_BTN2, KC_BTN1, SNIPING, DRGSCRL, _______, \
+                      KC_BTN2, KC_BTN1, KC_BTN3, KC_BTN2, KC_BTN1
 
 /**
  * \brief Navigation layer.
