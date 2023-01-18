@@ -69,9 +69,9 @@ static uint16_t auto_pointer_layer_timer = 0;
 // clang-format off
 /** \brief QWERTY layout (3 rows, 10 columns). */
 #define LAYOUT_LAYER_BASE                                                                     \
-       KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,    KC_K,    KC_L,    KC_U,    KC_Y, KC_QUOT, \
+       KC_Q,    KC_W,    KC_F,    KC_P,    KC_B, KC_SLSH,    KC_L,    KC_U,    KC_Y, KC_QUOT, \
        KC_A,    KC_R,    KC_S,    KC_T,    KC_G,    KC_M,    KC_N,    KC_E,    KC_I,    KC_O, \
-       KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,    KC_J,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, \
+       KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,    KC_J,    KC_H, KC_COMM,    KC_K,  KC_DOT, \
                       ESC_MED, SPC_NAV, TAB_FUN, ENT_SYM, BSP_NUM
 
 /** Convenience row shorthands. */
@@ -120,7 +120,7 @@ static uint16_t auto_pointer_layer_timer = 0;
     XXXXXXX, XXXXXXX, XXXXXXX, DPI_MOD, S_D_MOD,    CUT,     COPY,   PASTE, GO_BACK, GO_FWRD, \
     ______________HOME_ROW_GACS_L______________, ______________HOME_ROW_GACS_R______________, \
     _______, DRGSCRL, SNIPING, XXXXXXX, XXXXXXX, KC_BTN2, KC_BTN1, SNIPING, DRGSCRL, _______, \
-                      KC_BTN2, KC_BTN1, KC_BTN3, KC_BTN2, KC_BTN1
+                      KC_BTN2, KC_BTN1, KC_BTN3, KC_BTN1, KC_BTN2
 
 /**
  * \brief Navigation layer.
