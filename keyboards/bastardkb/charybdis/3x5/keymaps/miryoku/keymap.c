@@ -271,26 +271,28 @@ static td_tap_t ql_tap_state = {.is_press_action = true, .state = TD_NONE};
 
 void ql_finished(qk_tap_dance_state_t *state, void *user_data) {
     ql_tap_state.state = cur_dance(state);
-    switch (ql_tap_state.state) {
-        case TD_SINGLE_TAP:
-            tap_code(KC_SLSH);
-            break;
-        case TD_SINGLE_HOLD:
-            layer_on(LAYER_POINTER);
-            break;
-        case TD_DOUBLE_TAP:
-            tap_code(KC_SLSH);
-            tap_code(KC_SLSH);
-            break;
-        case TD_DOUBLE_HOLD:
-            if (layer_state_is(LAYER_POINTER)) {
-                layer_off(LAYER_POINTER);
-            } else {
+    if (layer_state_is(LAYER_POINTER)) {
+        if (ql_tap_state.state == TD_DOUBLE_HOLD) {
+            layer_off(LAYER_POINTER);
+        }
+    } else {
+        switch (ql_tap_state.state) {
+            case TD_SINGLE_TAP:
+                tap_code(KC_SLSH);
+                break;
+            case TD_SINGLE_HOLD:
                 layer_on(LAYER_POINTER);
-            }
-            break;
-        default:
-            break;
+                break;
+            case TD_DOUBLE_TAP:
+                tap_code(KC_SLSH);
+                tap_code(KC_SLSH);
+                break;
+            case TD_DOUBLE_HOLD:
+                layer_on(LAYER_POINTER);
+                break;
+            default:
+                break;
+        }
     }
 }
 
