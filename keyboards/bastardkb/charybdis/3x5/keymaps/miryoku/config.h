@@ -36,6 +36,10 @@
  */
 #define IGNORE_MOD_TAP_INTERRUPT
 
+/* Tap dance definitions */
+// #define TAPPING_TERM 175
+// #define TAPPING_TERM_PER_KEY
+
 /* Charybdis-specific features. */
 
 #ifdef POINTING_DEVICE_ENABLE

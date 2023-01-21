@@ -58,6 +58,30 @@ static uint16_t auto_pointer_layer_timer = 0;
 #define PASTE LGUI(KC_V)
 #define GO_BACK LGUI(KC_LEFT)
 #define GO_FWRD LGUI(KC_RIGHT)
+#define SLSH_PTR TD(_SLSH_PTR)
+
+// Tap dance keycodes
+enum td_keycodes {
+    _SLSH_PTR,
+};
+
+// Define a type containing the tap-dance states
+typedef enum { TD_NONE, TD_UNKOWN, TD_SINGLE_TAP, TD_SINGLE_HOLD, TD_DOUBLE_TAP, TD_DOUBLE_HOLD } td_state_t;
+
+// Create a gloval instance of the tap-dance state type
+typedef struct {
+    bool       is_press_action;
+    td_state_t state;
+} td_tap_t;
+
+// Declare tap-dance functions
+
+// Function to determine the current tap state
+td_state_t cur_dance(qk_tap_dance_state_t *state);
+
+// `finished` and `reset` functions for the tap-dance keycode
+void ql_finished(qk_tap_dance_state_t *state, void *user_data);
+void ql_reset(qk_tap_dance_state_t *state, void *user_data);
 
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
@@ -71,7 +95,7 @@ static uint16_t auto_pointer_layer_timer = 0;
 #define LAYOUT_LAYER_BASE                                                                     \
        KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,    KC_J,    KC_L,    KC_U,    KC_Y, KC_QUOT, \
        KC_A,    KC_R,    KC_S,    KC_T,    KC_G,    KC_M,    KC_N,    KC_E,    KC_I,    KC_O, \
-       KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,    KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, \
+       KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,    KC_K,    KC_H, KC_COMM,  KC_DOT, SLSH_PTR, \
                       ESC_MED, SPC_NAV, TAB_FUN, ENT_SYM, BSP_NUM
 
 /** Convenience row shorthands. */
@@ -162,6 +186,8 @@ static uint16_t auto_pointer_layer_timer = 0;
     KC_TILD, KC_EXLM,   KC_AT, KC_HASH, KC_PIPE, _______________DEAD_HALF_ROW_______________, \
                       KC_LPRN, KC_RPRN, KC_UNDS, _______, XXXXXXX
 
+
+
 /**
  * \brief Add Home Row mod to a layout.
  *
@@ -193,7 +219,7 @@ static uint16_t auto_pointer_layer_timer = 0;
  *
  *     POINTER_MOD(LAYER_ALPHAS_QWERTY)
  */
-#define _POINTER_MOD(                                                  \
+ #define _POINTER_MOD(                                                  \
     L00, L01, L02, L03, L04, R05, R06, R07, R08, R09,                  \
     L10, L11, L12, L13, L14, R15, R16, R17, R18, R19,                  \
     L20, L21, L22, L23, L24, R25, R26, R27, R28, R29,                  \
@@ -202,11 +228,11 @@ static uint16_t auto_pointer_layer_timer = 0;
              R05,         R06,         R07,         R08,         R09,  \
              L10,         L11,         L12,         L13,         L14,  \
              R15,         R16,         R17,         R18,         R19,  \
-      _L_PTR(L20),        L21,         L22,         L23,         L24,  \
-             R25,         R26,         R27,         R28,  _L_PTR(R29), \
+             L20,         L21,         L22,         L23,         L24,  \
+             R25,         R26,         R27,         R28,         R29, \
       __VA_ARGS__
-#define POINTER_MOD(...) _POINTER_MOD(__VA_ARGS__)
 
+#define POINTER_MOD(...) _POINTER_MOD(__VA_ARGS__)
 #define LAYOUT_wrapper(...) LAYOUT_charybdis_3x5(__VA_ARGS__)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -221,6 +247,62 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [LAYER_SYMBOLS] = LAYOUT_wrapper(LAYOUT_LAYER_SYMBOLS),
 };
 // clang-format on
+
+/* Tap-dance codes */
+
+// Determine the current tap dance status
+td_state_t cur_dance(qk_tap_dance_state_t *state) {
+    if (state->count == 1) {
+        if (!state->pressed)
+            return TD_SINGLE_TAP;
+        else
+            return TD_SINGLE_HOLD;
+    } else if (state->count == 2) {
+        if (!state->pressed)
+            return TD_DOUBLE_TAP;
+        else
+            return TD_DOUBLE_HOLD;
+    } else
+        return TD_NONE;
+}
+
+// Initialize tap structure associated with example tap dance key
+static td_tap_t ql_tap_state = {.is_press_action = true, .state = TD_NONE};
+
+void ql_finished(qk_tap_dance_state_t *state, void *user_data) {
+    ql_tap_state.state = cur_dance(state);
+    switch (ql_tap_state.state) {
+        case TD_SINGLE_TAP:
+            tap_code(KC_SLSH);
+            break;
+        case TD_SINGLE_HOLD:
+            layer_on(LAYER_POINTER);
+            break;
+        case TD_DOUBLE_TAP:
+            tap_code(KC_SLSH);
+            tap_code(KC_SLSH);
+            break;
+        case TD_DOUBLE_HOLD:
+            if (layer_state_is(LAYER_POINTER)) {
+                layer_off(LAYER_POINTER);
+            } else {
+                layer_on(LAYER_POINTER);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void ql_reset(qk_tap_dance_state_t *state, void *user_data) {
+    if (ql_tap_state.state == TD_SINGLE_HOLD) {
+        layer_off(LAYER_POINTER);
+    }
+    ql_tap_state.state = TD_NONE;
+}
+
+// Associate our tap dance key with its functionality.
+qk_tap_dance_action_t tap_dance_actions[] = {[_SLSH_PTR] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ql_finished, ql_reset)};
 
 #ifdef POINTING_DEVICE_ENABLE
 #    ifdef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
