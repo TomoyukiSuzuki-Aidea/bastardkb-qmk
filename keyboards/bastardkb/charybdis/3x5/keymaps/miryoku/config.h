@@ -40,6 +40,9 @@
 // #define TAPPING_TERM 175
 // #define TAPPING_TERM_PER_KEY
 
+/* Enabling combos */
+#define COMBO_COUNT 2
+
 /* Charybdis-specific features. */
 
 #ifdef POINTING_DEVICE_ENABLE

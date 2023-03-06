@@ -60,6 +60,7 @@ static uint16_t auto_pointer_layer_timer = 0;
 #define GO_FWRD LGUI(KC_RIGHT)
 #define SLSH_PTR TD(_SLSH_PTR)
 
+/* FROM: TAP DANCE CONFIG FROM */
 // Tap dance keycodes
 enum td_keycodes {
     _SLSH_PTR,
@@ -72,6 +73,7 @@ typedef enum { TD_NONE, TD_UNKOWN, TD_SINGLE_TAP, TD_SINGLE_HOLD, TD_DOUBLE_TAP,
 typedef struct {
     bool       is_press_action;
     td_state_t state;
+    td_state_t prev_state;
 } td_tap_t;
 
 // Declare tap-dance functions
@@ -82,6 +84,19 @@ td_state_t cur_dance(qk_tap_dance_state_t *state);
 // `finished` and `reset` functions for the tap-dance keycode
 void ql_finished(qk_tap_dance_state_t *state, void *user_data);
 void ql_reset(qk_tap_dance_state_t *state, void *user_data);
+/* TO: TAP DANCE CONFIG */
+
+/* FROM: COMBO CONFIG */
+enum combo_events { ESC_COMBO, SWITCH_LANG_COMBO };
+
+const uint16_t PROGMEM esc_combo[]         = {KC_Q, KC_W, COMBO_END};
+const uint16_t PROGMEM switch_lang_combo[] = {KC_D, KC_H, COMBO_END};
+
+combo_t key_combos[COMBO_COUNT] = {
+    [ESC_COMBO]         = COMBO(esc_combo, KC_ESC),
+    [SWITCH_LANG_COMBO] = COMBO(switch_lang_combo, LCTL(KC_SPC)),
+};
+/* TO: COMBO CONFIG */
 
 #ifndef POINTING_DEVICE_ENABLE
 #    define DRGSCRL KC_NO
@@ -267,7 +282,7 @@ td_state_t cur_dance(qk_tap_dance_state_t *state) {
 }
 
 // Initialize tap structure associated with example tap dance key
-static td_tap_t ql_tap_state = {.is_press_action = true, .state = TD_NONE};
+static td_tap_t ql_tap_state = {.is_press_action = true, .state = TD_NONE, .prev_state = TD_NONE};
 
 void ql_finished(qk_tap_dance_state_t *state, void *user_data) {
     ql_tap_state.state = cur_dance(state);
@@ -297,10 +312,11 @@ void ql_finished(qk_tap_dance_state_t *state, void *user_data) {
 }
 
 void ql_reset(qk_tap_dance_state_t *state, void *user_data) {
-    if (ql_tap_state.state == TD_SINGLE_HOLD) {
+    if (ql_tap_state.state == TD_SINGLE_HOLD && ql_tap_state.prev_state != TD_DOUBLE_HOLD) {
         layer_off(LAYER_POINTER);
     }
-    ql_tap_state.state = TD_NONE;
+    ql_tap_state.prev_state = ql_tap_state.state;
+    ql_tap_state.state      = TD_NONE;
 }
 
 // Associate our tap dance key with its functionality.
